@@ -1,0 +1,42 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.sqlite
+*.db
+nexus_dev.db
+
+# ---- ML artifacts ----
+ml/artifacts/*
+!ml/artifacts/.gitkeep
+
+# ---- Node / frontend ----
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+*.local
+
+# ---- Env / secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- Data ----
+data/backblaze/*
+!data/backblaze/.gitkeep
+data/docs/*
+!data/docs/.gitkeep
+
+# ---- OS / editors ----
+.DS_Store
+.idea/
+.vscode/
+*.swp
