@@ -37,10 +37,11 @@ docker compose up --build
 # UI    → http://localhost:5173
 ```
 
-Apply database migrations (first run):
+Apply database migrations and seed telemetry (first run):
 
 ```bash
 docker compose exec backend alembic upgrade head
+docker compose exec backend python -m app.etl.loader --source synthetic --drives 200 --days 90
 ```
 
 ### Option B — Run services locally (no Docker)
@@ -51,9 +52,13 @@ docker compose exec backend alembic upgrade head
 cd backend
 python3.12 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-# Uses the DATABASE_URL from ../.env (Postgres). For a quick DB-less check:
+alembic upgrade head                                   # create schema
+python -m app.etl.loader --source synthetic --drives 200 --days 90   # seed telemetry
+uvicorn app.main:app --reload                          # serve API
+pytest                                                 # run backend tests
+
+# Quick DB-less smoke check (SQLite, no schema needed for /health):
 DATABASE_URL="sqlite+pysqlite:///:memory:" uvicorn app.main:app --reload
-pytest                       # run backend tests
 ```
 
 **Frontend** (Node 20):
@@ -68,7 +73,7 @@ npm run build                # type-check + production build
 ## Build phases
 
 1. **Skeleton** — Docker Compose, FastAPI, React, Postgres+pgvector, `/health` ✅
-2. ETL pipeline & database schema
+2. **ETL pipeline & database schema** — 8 tables, synthetic + Backblaze sources, `/drives` ✅
 3. XGBoost failure prediction model
 4. RAG / vector search (LlamaIndex + pgvector)
 5. LangGraph multi-agent workflow
@@ -78,5 +83,6 @@ npm run build                # type-check + production build
 
 ## API surface (grows per phase)
 
-`GET /health` · `GET /` — service info. `GET /drives`, `POST /predict`, `POST /retrieve`,
-`POST /chat` land in later phases.
+`GET /health` · `GET /` — service info. `GET /drives` (paged, `?status=` filter) ·
+`GET /drives/{id}` (drive + telemetry + latest prediction). `POST /predict`,
+`POST /retrieve`, `POST /chat` land in later phases.
