@@ -26,6 +26,7 @@ services:
       CORS_ORIGINS: http://localhost:5173
       LOG_LEVEL: INFO
       ENVIRONMENT: development
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     ports:
       - "8000:8000"
     volumes:
