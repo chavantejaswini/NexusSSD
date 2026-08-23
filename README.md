@@ -53,7 +53,7 @@ docker compose exec backend python -m app.etl.loader --source synthetic --drives
 ```bash
 cd backend
 python3.12 -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev,ml]"                             # ml extras for XGBoost
+pip install -e ".[dev,ml,agents]"                      # ml (XGBoost) + agents (LangGraph)
 # macOS only: XGBoost needs the OpenMP runtime -> `brew install libomp`
 # RAG backends: the offline default needs nothing extra. For LlamaIndex-over-pgvector
 # (used automatically on Postgres) add: pip install -e ".[llamaindex,ai]"
@@ -83,7 +83,7 @@ npm run build                # type-check + production build
 2. **ETL pipeline & database schema** — 8 tables, synthetic + Backblaze sources, `/drives` ✅
 3. **XGBoost failure prediction model** — training + calibration, `/predict`, fleet scoring + alerts ✅
 4. **RAG / vector search** — LlamaIndex over pgvector (native fallback), pluggable embeddings, `/retrieve` ✅
-5. LangGraph multi-agent workflow
+5. **LangGraph multi-agent workflow** — planner/SQL/prediction/RAG/evaluation/summary agents, `/chat` ✅
 6. Dashboard (Fleet Overview, Drive Details, Prediction Explorer, Chat, Metrics)
 7. Logging, monitoring, Grafana
 8. Deployment (Docker, GitHub Actions, AWS)
@@ -93,5 +93,6 @@ npm run build                # type-check + production build
 `GET /health` · `GET /` — service info. `GET /drives` (paged, `?status=` filter) ·
 `GET /drives/{id}` (drive + telemetry + latest prediction) · `POST /predict`
 (by `drive_id` or raw `features`; returns probability, risk band, top features) ·
-`POST /retrieve` (semantic search over ingested docs, returns cited chunks).
-`POST /chat` lands in Phase 5.
+`POST /retrieve` (semantic search over ingested docs, returns cited chunks) ·
+`POST /chat` (natural-language fleet questions answered by the multi-agent graph,
+returns the answer + which agents ran + a step trace).
