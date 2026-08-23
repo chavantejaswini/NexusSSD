@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from typing import Annotated
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -33,7 +34,11 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://nexus:nexus@localhost:5432/nexus"
 
     # ---- CORS ----
-    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
+    # NoDecode: keep pydantic-settings from JSON-decoding the env value; the
+    # validator below splits a comma-separated string instead.
+    cors_origins: Annotated[list[str], NoDecode] = Field(
+        default_factory=lambda: ["http://localhost:5173"]
+    )
 
     # ---- AI providers (used from Phase 4 onward) ----
     openai_api_key: str | None = None

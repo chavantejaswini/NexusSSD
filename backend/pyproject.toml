@@ -64,5 +64,10 @@ include = ["app*"]
 line-length = 100
 target-version = "py312"
 
+[tool.ruff.lint]
+# Pin the rule set explicitly so linting is deterministic across ruff versions
+# (newer ruff broadened its defaults). This is the pycodestyle+pyflakes core.
+select = ["E4", "E7", "E9", "F"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
