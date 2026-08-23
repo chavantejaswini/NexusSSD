@@ -13,7 +13,7 @@ RUN apt-get update \
 
 # Install dependencies first for better layer caching.
 COPY pyproject.toml ./
-RUN pip install --upgrade pip && pip install -e ".[ml]"
+RUN pip install --upgrade pip && pip install -e ".[ml,ai,llamaindex]"
 
 # Application code (mounted over in dev via docker-compose volume).
 COPY . .

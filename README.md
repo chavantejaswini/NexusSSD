@@ -10,8 +10,9 @@ risk through a React/FastAPI application.
 - **Backend:** FastAPI · SQLAlchemy 2.0 · Alembic · Pydantic v2 (Python 3.12)
 - **Frontend:** React · TypeScript · Tailwind CSS · React Query · Recharts (Vite)
 - **Database:** PostgreSQL 16 + pgvector
-- **AI/ML:** XGBoost · pgvector retrieval · LangGraph · pluggable embeddings
-  (offline hashing by default · OpenAI or sentence-transformers optional)
+- **AI/ML:** XGBoost · LlamaIndex over pgvector (native pgvector fallback) ·
+  LangGraph · pluggable embeddings (offline hashing default · OpenAI or
+  sentence-transformers optional)
 - **DevOps:** Docker Compose · GitHub Actions · Grafana
 
 ## Repository layout
@@ -54,6 +55,8 @@ cd backend
 python3.12 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,ml]"                             # ml extras for XGBoost
 # macOS only: XGBoost needs the OpenMP runtime -> `brew install libomp`
+# RAG backends: the offline default needs nothing extra. For LlamaIndex-over-pgvector
+# (used automatically on Postgres) add: pip install -e ".[llamaindex,ai]"
 alembic upgrade head                                   # create schema
 python -m app.etl.loader --source synthetic --drives 200 --days 90   # seed telemetry
 python -m app.ml.train --score                         # train model + score fleet
@@ -79,7 +82,7 @@ npm run build                # type-check + production build
 1. **Skeleton** — Docker Compose, FastAPI, React, Postgres+pgvector, `/health` ✅
 2. **ETL pipeline & database schema** — 8 tables, synthetic + Backblaze sources, `/drives` ✅
 3. **XGBoost failure prediction model** — training + calibration, `/predict`, fleet scoring + alerts ✅
-4. **RAG / vector search** — pluggable embeddings, pgvector retrieval, doc ingestion, `/retrieve` ✅
+4. **RAG / vector search** — LlamaIndex over pgvector (native fallback), pluggable embeddings, `/retrieve` ✅
 5. LangGraph multi-agent workflow
 6. Dashboard (Fleet Overview, Drive Details, Prediction Explorer, Chat, Metrics)
 7. Logging, monitoring, Grafana

@@ -12,11 +12,29 @@ from dataclasses import dataclass
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.logging import get_logger
 from app.models.knowledge import Document, Embedding
 from app.services.embeddings import get_embedder
 
 logger = get_logger(__name__)
+
+
+def _use_llamaindex(session: Session) -> bool:
+    """Decide whether to route through the LlamaIndex (pgvector) backend."""
+    backend = settings.rag_backend
+    if backend == "native":
+        return False
+    if backend == "llamaindex":
+        return True
+    # auto: LlamaIndex on Postgres when it's importable, else native.
+    if session.get_bind().dialect.name != "postgresql":
+        return False
+    try:
+        import llama_index.core  # noqa: F401
+    except ImportError:
+        return False
+    return True
 
 
 def chunk_text(content: str, max_chars: int = 800, overlap: int = 100) -> list[str]:
@@ -46,6 +64,11 @@ def ingest_documents(session: Session, docs: list[dict]) -> IngestStats:
     Idempotent per `source`: an existing document with the same source is
     replaced (its chunks cascade-delete) so re-ingesting picks up edits.
     """
+    if _use_llamaindex(session):
+        from app.services import rag_llamaindex
+
+        return rag_llamaindex.ingest_documents(docs)
+
     embedder = get_embedder()
     stats = IngestStats()
 
@@ -104,6 +127,11 @@ def _cosine(a: list[float], b: list[float]) -> float:
 
 
 def retrieve(session: Session, query: str, top_k: int = 5) -> list[RetrievedChunk]:
+    if _use_llamaindex(session):
+        from app.services import rag_llamaindex
+
+        return rag_llamaindex.retrieve(query, top_k)
+
     embedder = get_embedder()
     qvec = embedder.embed([query])[0]
     dialect = session.get_bind().dialect.name

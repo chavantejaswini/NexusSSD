@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
     llm_provider: str = "auto"  # auto | openai | local
     embedding_dim: int = 1536
+    # RAG orchestration backend. "auto" uses LlamaIndex (over pgvector) on
+    # PostgreSQL and the native pgvector path on SQLite / when LlamaIndex is absent.
+    rag_backend: str = "auto"  # auto | native | llamaindex
 
     # ---- ML ----
     model_artifact_dir: str = "ml/artifacts"
