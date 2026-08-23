@@ -23,13 +23,19 @@ ml = [
     "numpy>=1.26",
     "joblib>=1.3",
 ]
+# Cloud LLM/embeddings provider (light).
 ai = [
-    "llama-index>=0.11",
-    "llama-index-vector-stores-postgres>=0.2",
+    "openai>=1.40",
+]
+# Optional local embedding model (heavy: pulls PyTorch). Not required — the
+# built-in offline HashingEmbedder is the zero-dependency default.
+local-embeddings = [
+    "sentence-transformers>=3.0",
+]
+# Multi-agent orchestration (Phase 5).
+agents = [
     "langgraph>=0.2",
     "langchain-core>=0.3",
-    "openai>=1.40",
-    "sentence-transformers>=3.0",
 ]
 dev = [
     "pytest>=8.0",
