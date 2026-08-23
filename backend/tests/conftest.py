@@ -41,6 +41,16 @@ def _clean_tables(_schema):
     yield
 
 
+@pytest.fixture(autouse=True)
+def _reset_model_cache():
+    """Clear the cached prediction model so tests never share model state."""
+    from app.services import prediction_service
+
+    prediction_service.reload_model()
+    yield
+    prediction_service.reload_model()
+
+
 @pytest.fixture()
 def db_session():
     session = SessionLocal()

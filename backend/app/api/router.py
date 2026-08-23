@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from app.api.routes import drives, health
+from app.api.routes import drives, health, predict
 
 api_router = APIRouter()
 api_router.include_router(health.router)
 api_router.include_router(drives.router)
+api_router.include_router(predict.router)
 
-# Phase 3+ routers (predict, retrieve, chat) get included here as they land.
+# Phase 4+ routers (retrieve, chat) get included here as they land.
