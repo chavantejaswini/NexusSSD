@@ -35,8 +35,9 @@ NexusSSD/
 ```bash
 cp .env.example .env
 docker compose up --build
-# API   → http://localhost:8000  (docs at /docs)
-# UI    → http://localhost:5173
+# API      → http://localhost:8000  (docs at /docs, metrics at /metrics)
+# UI       → http://localhost:5173
+# Grafana  → http://localhost:3000  (admin/admin — Prometheus at :9090)
 ```
 
 Apply database migrations and seed telemetry (first run):
@@ -84,13 +85,13 @@ npm run build                # type-check + production build
 3. **XGBoost failure prediction model** — training + calibration, `/predict`, fleet scoring + alerts ✅
 4. **RAG / vector search** — LlamaIndex over pgvector (native fallback), pluggable embeddings, `/retrieve` ✅
 5. **LangGraph multi-agent workflow** — planner/SQL/prediction/RAG/evaluation/summary agents, `/chat` ✅
-6. Dashboard (Fleet Overview, Drive Details, Prediction Explorer, Chat, Metrics)
-7. Logging, monitoring, Grafana
+6. **Dashboard** — Fleet Overview, Drive Details, Prediction Explorer, AI Chat, System Metrics ✅
+7. **Logging, monitoring, Grafana** — correlation-ID request logs, `/metrics`, Prometheus + Grafana ✅
 8. Deployment (Docker, GitHub Actions, AWS)
 
 ## API surface (grows per phase)
 
-`GET /health` · `GET /` — service info. `GET /drives` (paged, `?status=` filter) ·
+`GET /health` · `GET /` — service info · `GET /metrics` (Prometheus). `GET /drives` (paged, `?status=` filter) ·
 `GET /drives/{id}` (drive + telemetry + latest prediction) · `POST /predict`
 (by `drive_id` or raw `features`; returns probability, risk band, top features) ·
 `POST /retrieve` (semantic search over ingested docs, returns cited chunks) ·
