@@ -78,6 +78,17 @@ npm run dev                  # http://localhost:5173
 npm run build                # type-check + production build
 ```
 
+### Production
+
+Built images (no source mounts), migrations applied on start, static UI via nginx:
+
+```bash
+VITE_API_BASE_URL=http://<host>:8000 docker compose -f docker-compose.prod.yml up --build -d
+```
+
+See [docs/deployment.md](docs/deployment.md) for the full guide, including AWS
+(ECS/Fargate + RDS with pgvector) and CI/CD.
+
 ## Build phases
 
 1. **Skeleton** — Docker Compose, FastAPI, React, Postgres+pgvector, `/health` ✅
@@ -87,7 +98,7 @@ npm run build                # type-check + production build
 5. **LangGraph multi-agent workflow** — planner/SQL/prediction/RAG/evaluation/summary agents, `/chat` ✅
 6. **Dashboard** — Fleet Overview, Drive Details, Prediction Explorer, AI Chat, System Metrics ✅
 7. **Logging, monitoring, Grafana** — correlation-ID request logs, `/metrics`, Prometheus + Grafana ✅
-8. Deployment (Docker, GitHub Actions, AWS)
+8. **Deployment** — multi-stage prod images, prod compose, GitHub Actions CI, AWS guide ✅
 
 ## API surface (grows per phase)
 
